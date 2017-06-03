@@ -28,11 +28,27 @@ public class Worker implements Runnable{
 
 
     public void run(){
+
+
+
         try {
+//
+//            while(true){
+//                Task newtask = queue.take();
+//                findJarAndProcess.FindJarAndProcess(MyJars, newtask);
+//
+//                writeResult.resultToDB(newtask);
+//                if (newtask.getNewTask() != null) {
+//                    newTaskToDb.strToDB(newtask);
+//                }
+//
+//
+//            }
+
             FindJars findJars = new FindJars();
             ArrayList<Interf> MyJars =  findJars.findJar();
 
-            while (!queue.isEmpty() && queue.size()>0) {
+            while (!queue.isEmpty()) {
                 if (queue.size() < 2 && Main.getNew() != 0 && !findJars.scan) {//2threads
                     try {
                         Task myTask = getInfFromDb.GetInfFromBD(Main.getNew());
