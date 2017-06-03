@@ -12,30 +12,30 @@ import static java.lang.Thread.sleep;
 public class NewWorker implements Runnable{
 
     private LinkedBlockingQueue<Task> queue;
-    //ArrayList<Interf> MyJars;
+    ArrayList<Interf> MyJars;
     FindJarAndProcess findJarAndProcess = new FindJarAndProcess();
     WriteResult writeResult = new WriteResult();
     NewTaskToDb newTaskToDb = new NewTaskToDb();
 
 
 
-    public NewWorker(LinkedBlockingQueue<Task> blockingQueue){
+    public NewWorker(LinkedBlockingQueue<Task> blockingQueue, ArrayList<Interf> MyJars){
         this.queue = blockingQueue;
-        //this.MyJars = MyJars;
+        this.MyJars = MyJars;
     }
 
 
     public void run() {
         try {
-            FindJars findJars = new FindJars();
-            ArrayList<Interf> MyJars =  findJars.findJar();//fix
+//            FindJars findJars = new FindJars();
+//            ArrayList<Interf> MyJars =  findJars.findJar();//fix
             while (!queue.isEmpty()) {
                 Task newtask = queue.take();
-                try {
-                    Task task = findJarAndProcess.FindJarAndProcess(MyJars, newtask);//потім поміняєм шоб не повертало
-                    writeResult.resultToDB(task);
-                    if (task.getNewTask() != null) {
-                        newTaskToDb.strToDB(task);
+                try {//Task task
+                    findJarAndProcess.FindJarAndProcess(MyJars, newtask);//потім поміняєм шоб не повертало
+                    writeResult.resultToDB(newtask);
+                    if (newtask.getNewTask() != null) {
+                        newTaskToDb.strToDB(newtask);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -49,8 +49,8 @@ public class NewWorker implements Runnable{
 
                 }
             }
-            sleep(1000);
-            System.out.print("I wait  "+Thread.currentThread().getName());
+            sleep(100);
+           // System.out.print("I wait  "+Thread.currentThread().getName());
             if (!queue.isEmpty()){
                 run();
             }

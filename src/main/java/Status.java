@@ -6,8 +6,7 @@ public class Status {
         NEW_ONE(0),
         DONE(1),
         IN_PROCESS(2),
-        FAILED(3),
-        NOT_JAR(4);
+        FAILED(3);
 
         private final int value;
 

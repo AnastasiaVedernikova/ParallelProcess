@@ -37,7 +37,7 @@ public class FindJarAndProcess {
         if (task.getResult()== null){
             Connection con = new GetConnection().getCon();
             String s = "UPDATE Task " +
-                    " SET Status = "+Status.status.NOT_JAR.getValue() +
+                    " SET Status = "+Status.status.FAILED.getValue() +
                     " WHERE ID = ? ";
             PreparedStatement pstmt1 = con.prepareStatement(s);
             pstmt1.setInt(1, ClientData.getId());
