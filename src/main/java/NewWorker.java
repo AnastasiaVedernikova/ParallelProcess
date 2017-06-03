@@ -38,6 +38,7 @@ public class NewWorker implements Runnable{
                         newTaskToDb.strToDB(task);
                     }
                 } catch (Exception e) {
+                    e.printStackTrace();
                     Connection con = new GetConnection().getCon();
                     String s = "UPDATE Task " +
                             " SET Status = " + Status.status.FAILED.getValue() +//failed
@@ -48,7 +49,7 @@ public class NewWorker implements Runnable{
 
                 }
             }
-            sleep(100);
+            sleep(1000);
             System.out.print("I wait  "+Thread.currentThread().getName());
             if (!queue.isEmpty()){
                 run();

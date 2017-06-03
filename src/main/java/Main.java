@@ -12,32 +12,32 @@ import java.util.concurrent.LinkedBlockingQueue;
  * Created by cs.ucu.edu.ua on 22.05.2017.
  */
 
-public class Main {
-
-    public int getID() throws Exception {
-        Connection con = new GetConnection().getCon();
-        Statement stmt = con.createStatement();
-        ResultSet rs = stmt.executeQuery("SELECT Max(id) from Task");
-        String LastID = "";
-        while (rs.next()) {
-            LastID = rs.getString(1);
-        }
-        return Integer.parseInt(LastID);
-    }
-
-    public int getNew() throws Exception {
-        Connection con = new GetConnection().getCon();
-        Statement stmt = con.createStatement();
-        Status st = new Status();
-
-        ResultSet rs = stmt.executeQuery("SELECT Top 1 ID from Task where Status=" + Status.status.NEW_ONE.getValue());
-        int LastID = 0;
-        while (rs.next()) {
-            LastID = rs.getInt(1);
-        }
-        return LastID;
-    }
-}
+//public class Main {
+//
+//    public int getID() throws Exception {
+//        Connection con = new GetConnection().getCon();
+//        Statement stmt = con.createStatement();
+//        ResultSet rs = stmt.executeQuery("SELECT Max(id) from Task");
+//        String LastID = "";
+//        while (rs.next()) {
+//            LastID = rs.getString(1);
+//        }
+//        return Integer.parseInt(LastID);
+//    }
+//
+//    public int getNew() throws Exception {
+//        Connection con = new GetConnection().getCon();
+//        Statement stmt = con.createStatement();
+//        Status st = new Status();
+//
+//        ResultSet rs = stmt.executeQuery("SELECT Top 1 ID from Task where Status=" + Status.status.NEW_ONE.getValue());
+//        int LastID = 0;
+//        while (rs.next()) {
+//            LastID = rs.getInt(1);
+//        }
+//        return LastID;
+//    }
+//}
 
 //    public static void main(String[] args){
 //        Main Main = new Main();
