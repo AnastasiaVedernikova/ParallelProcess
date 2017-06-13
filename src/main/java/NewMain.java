@@ -11,18 +11,24 @@ import static java.lang.Thread.sleep;
 
 public class NewMain {
 
-    public int getNew(String ProjectIds) throws Exception{
+    public Task getNew( String nsql) throws Exception{//String ProjectIds,
         Connection con = new GetConnection().getCon();
         Statement stmt = con.createStatement();
         Status st = new Status();
-        String sql = "SELECT Top 1 ID from Task where Status="+ Status.status.NEW_ONE.getValue()+" and Project_ID in "+ ProjectIds;
-
-        ResultSet rs = stmt.executeQuery(sql);
-        int LastID=0;
-        while(rs.next()) {
-            LastID = rs.getInt(1);
+        Task t = null;
+        try {
+            ResultSet rs = stmt.executeQuery(nsql);
+            while (rs.next()) {
+                t = new Task();
+                t.setId(rs.getInt("ID"));
+                t.setProjectID(rs.getInt("Project_ID"));
+                t.setClientID(rs.getInt("Client_ID"));
+                t.setData(rs.getString("Data"));
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
-        return LastID;
+       return t;
     }
 
     public static void main(String[] args){
@@ -32,14 +38,44 @@ public class NewMain {
 
         try {
             ArrayList<Interf> MyJars = new FindJars().findJar();
-            String ProjectIds = " ( ";
-            for (int i = 0; i < MyJars.size(); i++) {
-                if (ProjectIds != " ( ") {
-                    ProjectIds += ", ";
-                }
-                ProjectIds += MyJars.get(i).getProjectID();
+
+            if (MyJars.size()==0){
+                System.out.print("Error jars");
+                System.exit(0);
             }
-            ProjectIds+=" )";
+                StringBuffer buf = new StringBuffer("(");
+
+
+            for (int i = 0,k=MyJars.size(),f=k-1; i < k; i++) {
+                buf.append(MyJars.get(i).getProjectID());
+                if(i<f) {
+                    buf.append(',');
+                }
+
+            }
+            buf.append(')');
+            String nsql = "declare @tmp table(ID int not null, \n" +
+                    "              Project_ID int not null,\n" +
+                    "              Data nvarchar(max) not null,\n" +
+                    "              Result nvarchar(max) null,\n" +
+                    "              Parent_Task_ID int null,\n" +
+                    "              Status int not null,\n" +
+                    "              Client_ID int not null);\n" +
+                    "               \n" +
+                    "               with q as\n" +
+                    "               (select top(1) T.ID, T.Project_ID, T.Data, T.Result, T.Parent_Task_ID, T.Status, P.Client_ID from Task T\n" +
+                    "                join Project P on T.Project_ID = P.ID \n" +
+                    "                where [Status] = 0\n" +
+                    "               and T.Project_ID in "+ buf.toString()+"\n" +
+                    "\t\t\t   )\n" +
+                    "\t\t\t   \n" +
+                    "             \n" +
+                    "\t\t\tupdate q with(readpast)\n" +
+                    "              set [Status] = 2\n" +
+                    "               output deleted.ID, deleted.Project_ID, deleted.Data, deleted.Result, deleted.Parent_Task_ID, deleted.Status, deleted.Client_ID into @tmp;\n" +
+                    "              \n" +
+                    "               select * from @tmp;";
+
 
             Connection con = new GetConnection().getCon();//заповнили чергу
             NewWorker w1 = new NewWorker(queue, MyJars);
@@ -49,26 +85,17 @@ public class NewMain {
             t1.start();
             t2.start();
             while(true) {
-                if (Main.getNew(ProjectIds) !=0){
-                    while (queue.size() < 2 ) {
-                        Task task = getInfFromDb.GetInfFromBD(Main.getNew(ProjectIds));
-                        String s = "UPDATE Task " +
-                                " SET Status = " + Status.status.IN_PROCESS.getValue() +//in process
-                                " WHERE ID = ? ";
-                        PreparedStatement pstmt = con.prepareStatement(s);
-                        pstmt.setInt(1, task.getId());
-                        pstmt.executeUpdate();
-                        queue.put(task);
-                    }
-                }else{
-                    sleep(100);
-                    if (Main.getNew(ProjectIds) == 0){
-                        t1.join();
-                        t2.join();
-                        break;
+                if (queue.size() < 2) {
+                    Task t = Main.getNew(nsql);//buf.toString(),
+                    System.out.print("data: "+ t.getData());
+                    System.out.print("id: " +t.getId());
+                    if (t != null) {
+                        queue.put(t);
                     }
                 }
-
+                else{
+                    sleep(100);
+                }
             }
         }catch (Exception e){
             System.out.print(e.getMessage());

@@ -9,7 +9,7 @@ import static java.lang.Thread.sleep;
 /**
  * Created by cs.ucu.edu.ua on 03.06.2017.
  */
-public class NewWorker implements Runnable{
+public class NewWorker implements Runnable {
 
     private LinkedBlockingQueue<Task> queue;
     ArrayList<Interf> MyJars;
@@ -18,46 +18,41 @@ public class NewWorker implements Runnable{
     NewTaskToDb newTaskToDb = new NewTaskToDb();
 
 
-
-    public NewWorker(LinkedBlockingQueue<Task> blockingQueue, ArrayList<Interf> MyJars){
+    public NewWorker(LinkedBlockingQueue<Task> blockingQueue, ArrayList<Interf> MyJars) {
         this.queue = blockingQueue;
         this.MyJars = MyJars;
     }
 
 
     public void run() {
-        try {
-//            FindJars findJars = new FindJars();
-//            ArrayList<Interf> MyJars =  findJars.findJar();//fix
-            while (!queue.isEmpty()) {
-                Task newtask = queue.take();
-                try {//Task task
-                    findJarAndProcess.FindJarAndProcess(MyJars, newtask);//потім поміняєм шоб не повертало
-                    writeResult.resultToDB(newtask);
-                    if (newtask.getNewTask() != null) {
-                        newTaskToDb.strToDB(newtask);
+
+        while (true) {
+            try {
+                Task newtask = queue.poll();
+                if (newtask != null) {
+                    try {
+                        findJarAndProcess.FindJarAndProcess(MyJars, newtask);//потім поміняєм шоб не повертало
+                        writeResult.resultToDB(newtask);
+                        if (newtask.getNewTask() != null) {
+                            newTaskToDb.strToDB(newtask);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Connection con = new GetConnection().getCon();
+                        String s = "UPDATE Task " +
+                                " SET Status = " + Status.status.FAILED.getValue() +//failed
+                                " WHERE ID = ? ";
+                        PreparedStatement pstmt1 = con.prepareStatement(s);
+                        pstmt1.setInt(1, newtask.getId());
+                        pstmt1.executeUpdate();
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Connection con = new GetConnection().getCon();
-                    String s = "UPDATE Task " +
-                            " SET Status = " + Status.status.FAILED.getValue() +//failed
-                            " WHERE ID = ? ";
-                    PreparedStatement pstmt1 = con.prepareStatement(s);
-                    pstmt1.setInt(1, newtask.getId());
-                    pstmt1.executeUpdate();
 
+                } else {
+                    sleep(100);
                 }
+            }catch (Exception e){
+                e.printStackTrace();
             }
-            sleep(100);
-           // System.out.print("I wait  "+Thread.currentThread().getName());
-            if (!queue.isEmpty()){
-                run();
-            }
-        }catch (Exception a){
-            a.printStackTrace();
-
         }
     }
 }
-
