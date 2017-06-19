@@ -16,7 +16,7 @@ public class WriteResult {
                     " SET Result = ? " +
                     " WHERE ID = ? ";
             String s = "UPDATE Task " +
-                    " SET Status = "+Status.status.DONE.getValue()+
+                    " SET Status = 1"+
                     " WHERE ID = ? ";
             PreparedStatement pstmt = con.prepareStatement(sql);
             PreparedStatement pstmt1 = con.prepareStatement(s);

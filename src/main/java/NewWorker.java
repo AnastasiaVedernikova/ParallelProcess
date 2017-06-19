@@ -31,7 +31,7 @@ public class NewWorker implements Runnable {
                 Task newtask = queue.poll();
                 if (newtask != null) {
                     try {
-                        findJarAndProcess.FindJarAndProcess(MyJars, newtask);//потім поміняєм шоб не повертало
+                        findJarAndProcess.FindJarAndProcess(MyJars, newtask);
                         writeResult.resultToDB(newtask);
                         if (newtask.getNewTask() != null) {
                             newTaskToDb.strToDB(newtask);
@@ -40,7 +40,7 @@ public class NewWorker implements Runnable {
                         e.printStackTrace();
                         Connection con = new GetConnection().getCon();
                         String s = "UPDATE Task " +
-                                " SET Status = " + Status.status.FAILED.getValue() +//failed
+                                " SET Status = 3"+//failed
                                 " WHERE ID = ? ";
                         PreparedStatement pstmt1 = con.prepareStatement(s);
                         pstmt1.setInt(1, newtask.getId());

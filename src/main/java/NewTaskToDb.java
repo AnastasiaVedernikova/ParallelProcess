@@ -11,15 +11,7 @@ public class NewTaskToDb {
         int projectID=task.getProjectID();
         String newTask = task.getNewTask();
 
-//        Statement stmt1 = con.createStatement();
-//        ResultSet rs1 = stmt1.executeQuery("SELECT MAX(id) from Task");
-//        String last = "";
-//        while(rs1.next()){
-//            last = rs1.getString(1);
-//        }
-//        int last_id = Integer.parseInt(last)+1;
-
-        String sql = "insert into Task (Project_ID, Data, Parent_Task_ID, Status) values ( ?, ?, ?, "+Status.status.NEW_ONE.getValue()+")";
+        String sql = "insert into Task (Project_ID, Data, Parent_Task_ID, Status) values ( ?, ?, ?, 0)";
         PreparedStatement stmt = con.prepareStatement(sql);
         stmt.setInt(1, projectID);
         stmt.setString(2, newTask);

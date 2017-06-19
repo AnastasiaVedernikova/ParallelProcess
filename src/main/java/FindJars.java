@@ -12,29 +12,24 @@ import java.util.jar.JarFile;
  * Created by cs.ucu.edu.ua on 26.05.2017.
  */
 public class FindJars {
-    public boolean scan = false;
-    public ArrayList<Interf> findJar() throws Exception {
+    public static  ArrayList<Interf> findJar() throws Exception {//передаємо директорію аргументом-рекурсія
         final File folder = new File("C:/Users/cs.ucu.edu.ua/IdeaProjects/papochka1");
         List<String> JarNames = new ArrayList<String>();
         ArrayList<Interf> MyJars = new ArrayList<Interf>();
-
         for (final File fileEntry : folder.listFiles()) {
             if (fileEntry.isDirectory()) {
                 findJar();
             } else {
                 JarNames.add(fileEntry.getName());
-
             }
         }
-
         for (String a : JarNames) {
+            // TODO: make a separate funtion with try  catch test.txt
             String pathToJar = "C:/Users/cs.ucu.edu.ua/IdeaProjects/papochka1/" + a;
             JarFile jarFile = new JarFile(pathToJar);
             Enumeration<JarEntry> e = jarFile.entries();
-
             URL[] urls = {new URL("jar:file:" + pathToJar + "!/")};
             URLClassLoader cl = URLClassLoader.newInstance(urls);
-
             while (e.hasMoreElements()) {
                 JarEntry je = e.nextElement();
                 if (je.isDirectory() || !je.getName().endsWith(".class")) {
